@@ -16,6 +16,7 @@ input double MaxRiskPerTrade = 1.0;
 
 input group "Strategy"
 input int TrendDetectionBarCount = 90;
+input double TrendDetectionRSquaredTreshold = 0.70;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -26,6 +27,7 @@ int OnInit()
    LOGGER_LEVEL = LoggingLevel;
    MAX_RISK_PER_TRADE = MaxRiskPerTrade;
    TREND_DETECTION_BAR_COUNT = TrendDetectionBarCount;
+   TREND_DETECTION_FIT_R_SQUARED_TRESHOLD = TrendDetectionRSquaredTreshold;
 
    log_info("Dalek initialized");
    return(INIT_SUCCEEDED);

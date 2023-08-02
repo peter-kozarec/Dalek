@@ -17,3 +17,7 @@ double MAX_RISK_PER_TRADE;
 //+------------------------------------------------------------------+
 int TREND_DETECTION_BAR_COUNT;
 //+------------------------------------------------------------------+
+//| Percentage change to detect trend                                |
+//+------------------------------------------------------------------+
+double TREND_DETECTION_FIT_R_SQUARED_TRESHOLD;
+
