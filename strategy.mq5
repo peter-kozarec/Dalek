@@ -28,9 +28,9 @@ void on_bar_aggregated()
 
 //---- Get rates
    matrix m_ohlct;
-   m_ohlct.CopyRates(_Symbol, _Period, COPY_RATES_OHLCT, 1, TREND_DETECTION_BAR_COUNT);
+   m_ohlct.CopyRates(_Symbol, _Period, COPY_RATES_CLOSE | COPY_RATES_VERTICAL, 1, TREND_DETECTION_BAR_COUNT);
 
-   vector v_close = m_ohlct.Row(3);
+   vector v_close = m_ohlct.Row(0);
 
 
 //---- Calculate polynomial regression
@@ -55,8 +55,10 @@ void on_bar_aggregated()
       v_fit[i] = sum;
      }
 
+   vector v_lr = v_close.LinearRegression();
+
 //---- Calculate r squared
-   const double rsq = r_squared(v_close, v_fit);
+   const double rsq = r_squared(v_close, v_lr);
    log_debug("R-Squared = " + rsq);
 
 //---- Determine uptrend

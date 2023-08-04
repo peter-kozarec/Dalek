@@ -49,15 +49,8 @@ vector polyfit(const vector & x, const vector & y, const double degree)
      {
       for(int j = 0; j < X.Cols(); j++)
         {
-         if(i == 0 && j == 0)
-           {
-            X[i][j] = m;
-           }
-         else
-           {
-            const vector cum = pow(x, i + j);
-            X[i][j] = cum.Sum();
-           }
+         const vector cum = pow(x, i + j);
+         X[i][j] = cum.Sum();
         }
      }
 
