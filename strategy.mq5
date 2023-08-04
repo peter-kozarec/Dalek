@@ -12,29 +12,62 @@
 //+------------------------------------------------------------------+
 void on_bar_aggregated()
   {
+//---- Create dependent vector
+   static vector v_dependent;
+   if(v_dependent.Size() == 0)
+     {
+      v_dependent.Resize(TREND_DETECTION_BAR_COUNT);
+      for(int i = 0; i < TREND_DETECTION_BAR_COUNT; i++)
+        {
+         v_dependent[i] = i;
+        }
+     }
+
+//---- Define polynomial degree to detect trend
+   static int degree = 1;
+
 //---- Get rates
-   vector v_close;
-   v_close.CopyRates(_Symbol, _Period, COPY_RATES_CLOSE, 1, TREND_DETECTION_BAR_COUNT);
-   
-//---- Calculate linear regression
-   const vector v_lr = v_close.LinearRegression();
-   log_debug("Linear regression calculated");
-   
+   matrix m_ohlct;
+   m_ohlct.CopyRates(_Symbol, _Period, COPY_RATES_OHLCT, 1, TREND_DETECTION_BAR_COUNT);
+
+   vector v_close = m_ohlct.Row(3);
+
+
+//---- Calculate polynomial regression
+   const vector v_coef = polyfit(v_dependent, v_close, degree);
+   log_debug("Polynomial regression solved");
+   for(int i = 0; i <= degree; i++)
+     {
+      log_debug("a" + i + " = " + v_coef[i]);
+     }
+
+//---- Fit into y = a0 + a1x + a2x2 ... anxn
+   vector v_fit;
+   v_fit.Resize(TREND_DETECTION_BAR_COUNT);
+
+   for(int i = 0; i < TREND_DETECTION_BAR_COUNT; i++)
+     {
+      double sum = 0;
+      for(int j = 0; j <= degree; j++)
+        {
+         sum += v_coef[j] * pow(v_close[i], j);
+        }
+      v_fit[i] = sum;
+     }
+
 //---- Calculate r squared
-   const double r_squared = r_squared_calculate(v_close, v_lr);
-   log_debug("R-Squared = " + r_squared);
+   const double rsq = r_squared(v_close, v_fit);
+   log_debug("R-Squared = " + rsq);
 
 //---- Determine uptrend
    static bool was_uptrend = false;
-   if(is_uptrend(v_lr, r_squared))
+   if(is_uptrend(v_fit, rsq))
      {
       if(!was_uptrend)
         {
          log_info("Uptrend started");
          was_uptrend = true;
         }
-        
-        
       return;
      }
    else
@@ -48,14 +81,13 @@ void on_bar_aggregated()
 
 //---- Determine downtrend
    static bool was_downtrend = false;
-   if(is_downtrend(v_lr, r_squared))
+   if(is_downtrend(v_fit, rsq))
      {
       if(!was_downtrend)
         {
          log_info("Downtrend started");
          was_downtrend = true;
         }
-        
       return;
      }
    else
