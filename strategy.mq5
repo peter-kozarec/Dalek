@@ -24,7 +24,7 @@ void on_bar_aggregated()
      }
 
 //---- Define polynomial degree to detect trend
-   static int degree = 1;
+   static int degree = 2;
 
 //---- Get rates
    matrix m_ohlct;
@@ -34,7 +34,7 @@ void on_bar_aggregated()
 
 
 //---- Calculate polynomial regression
-   const vector v_coef = polyfit(v_dependent, v_close, degree);
+   vector v_coef = polyfit(v_dependent, v_close, degree);
    log_debug("Polynomial regression of degree " + (string)degree + " solved");
    for(int i = 0; i <= degree; i++)
      {
@@ -50,7 +50,7 @@ void on_bar_aggregated()
       double sum = 0;
       for(int j = 0; j <= degree; j++)
         {
-         sum += v_coef[j] * pow(v_close[i], j);
+         sum += v_coef[j] * pow(v_dependent[i], j);
         }
       v_fit[i] = sum;
      }
