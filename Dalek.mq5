@@ -7,8 +7,10 @@
 #include "strategy.mqh"
 #include "configuration.mqh"
 #include "logger.mqh"
-
+#include "trader.mqh"
+//+------------------------------------------------------------------+
 input group "General"
+input ulong MagicNumber = 123456789;
 input LogLevel LoggingLevel = INFO;
 
 input group "RiskManagement"
@@ -16,7 +18,6 @@ input double MaxRiskPerTrade = 1.0;
 
 input group "Strategy"
 input int TrendDetectionBarCount = 90;
-input double TrendDetectionRSquaredTreshold = 0.70;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -24,12 +25,16 @@ input double TrendDetectionRSquaredTreshold = 0.70;
 int OnInit()
   {
 //--- Initialize configuration parameters
+   MAGIC_NUMBER = MagicNumber;
    LOGGER_LEVEL = LoggingLevel;
    MAX_RISK_PER_TRADE = MaxRiskPerTrade;
    TREND_DETECTION_BAR_COUNT = TrendDetectionBarCount;
-   TREND_DETECTION_FIT_R_SQUARED_TRESHOLD = TrendDetectionRSquaredTreshold;
+   log_info("Parameters set");
+   
+   initialize_trader();
+   log_info("Trader initialized");
 
-   log_info("Dalek initialized");
+   log_info("Dalek started");
    return(INIT_SUCCEEDED);
   }
 //+------------------------------------------------------------------+

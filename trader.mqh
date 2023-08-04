@@ -1,21 +1,15 @@
 //+------------------------------------------------------------------+
-//|                                                         defs.mqh |
+//|                                                       trader.mqh |
 //|                                    Copyright 2023, Peter Kozarec |
 //|                                                                  |
 //+------------------------------------------------------------------+
-#ifndef DALEK_DEFS_MQH
-#define DALEK_DEFS_MQH
+#ifndef DALEK_TRADER_MQH
+#define DALEK_TRADER_MQH
 //+------------------------------------------------------------------+
-//| Logging level                                                    |
+#include "defs.mqh"
 //+------------------------------------------------------------------+
-enum LogLevel
-  {
-   DEBUG    = 0,
-   INFO     = 1,
-   WARNING  = 2,
-   ERROR    = 3,
-   FATAL    = 4,
-   NO_LOGS  = 5 
-  };
+void initialize_trader();
+
+
 //+------------------------------------------------------------------+
 #endif

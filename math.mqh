@@ -3,6 +3,8 @@
 //|                                    Copyright 2023, Peter Kozarec |
 //|                                                                  |
 //+------------------------------------------------------------------+
+#ifndef DALEK_MATH_MQH
+#define DALEK_MATH_MQH
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -10,5 +12,6 @@ double r_squared(const vector & values, const vector & estimate);
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-vector polyfit(const vector & x, const vector & y, const double degree);
+vector polyfit(const vector & x, const vector & y, const ulong degree);
 //+------------------------------------------------------------------+
+#endif

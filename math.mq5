@@ -4,7 +4,6 @@
 //|                                                                  |
 //+------------------------------------------------------------------+
 #include "math.mqh"
-#include <Math\Alglib\alglib.mqh>
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -14,7 +13,7 @@ double r_squared(const vector & values, const vector & estimate)
    double numerator = 0;
    double denominator = 0;
 
-   for(int i = 0; i < values.Size(); i++)
+   for(ulong i = 0; i < values.Size(); i++)
      {
       numerator += pow(values[i] - estimate[i], 2);
       denominator += pow(values[i] - val_mean, 2);
@@ -25,38 +24,33 @@ double r_squared(const vector & values, const vector & estimate)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-vector polyfit(const vector & x, const vector & y, const double degree)
+vector polyfit(const vector & x, const vector & y, const ulong degree)
   {
-   const int m = x.Size();
-   const int n = degree + 1;
+   const ulong m = x.Size();
+   const ulong n = degree + 1;
 
    matrix Y;
    Y.Resize(n, 1);
 
-   for(int i = 0; i < Y.Rows(); i++)
+   for(ulong i = 0; i < Y.Rows(); i++)
      {
-      for(int j = 0; j < Y.Cols(); j++)
+      for(ulong j = 0; j < Y.Cols(); j++)
         {
-         const vector cum = y * pow(x, i);
-         Y[i][j] = cum.Sum();
+         Y[i][j] = (y * pow(x, i)).Sum();
         }
      }
 
    matrix X;
    X.Resize(n, n);
 
-   for(int i = 0; i < X.Rows(); i++)
+   for(ulong i = 0; i < X.Rows(); i++)
      {
-      for(int j = 0; j < X.Cols(); j++)
+      for(ulong j = 0; j < X.Cols(); j++)
         {
-         const vector cum = pow(x, i + j);
-         X[i][j] = cum.Sum();
+         X[i][j] = pow(x, i + j).Sum();
         }
      }
 
-   const matrix X_INVERSE = X.Inv();
-   const matrix B = X_INVERSE.MatMul(Y);
-
-   return B.Col(0);
+   return X.Inv().MatMul(Y).Col(0);
   }
 //+------------------------------------------------------------------+

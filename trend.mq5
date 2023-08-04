@@ -12,27 +12,13 @@
 //+------------------------------------------------------------------+
 bool is_downtrend(const vector & lr, const double r_squared)
   {
-   if(r_squared >= TREND_DETECTION_FIT_R_SQUARED_TRESHOLD)
-     {
-      if(lr[TREND_DETECTION_BAR_COUNT - 1] < lr[0])
-        {
-         return (true);
-        }
-     }
-   return (false);
+   return false;
   }
 //+------------------------------------------------------------------+
 //| Check if is uptrend                                              |
 //+------------------------------------------------------------------+
 bool is_uptrend(const vector & lr, const double r_squared)
   {
-   if(r_squared >= TREND_DETECTION_FIT_R_SQUARED_TRESHOLD)
-     {
-      if(lr[TREND_DETECTION_BAR_COUNT - 1] > lr[0])
-        {
-         return (true);
-        }
-     }
-   return (false);
+   return false;
   }
 //+------------------------------------------------------------------+

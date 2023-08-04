@@ -35,10 +35,10 @@ void on_bar_aggregated()
 
 //---- Calculate polynomial regression
    const vector v_coef = polyfit(v_dependent, v_close, degree);
-   log_debug("Polynomial regression solved");
+   log_debug("Polynomial regression of degree " + (string)degree + " solved");
    for(int i = 0; i <= degree; i++)
      {
-      log_debug("a" + i + " = " + v_coef[i]);
+      log_debug("Coefficient a" + (string)i + " = " + (string)v_coef[i]);
      }
 
 //---- Fit into y = a0 + a1x + a2x2 ... anxn
@@ -55,11 +55,9 @@ void on_bar_aggregated()
       v_fit[i] = sum;
      }
 
-   vector v_lr = v_close.LinearRegression();
-
 //---- Calculate r squared
-   const double rsq = r_squared(v_close, v_lr);
-   log_debug("R-Squared = " + rsq);
+   const double rsq = r_squared(v_close, v_fit);
+   log_debug("R-Squared calculated = " + (string)rsq);
 
 //---- Determine uptrend
    static bool was_uptrend = false;
