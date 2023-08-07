@@ -66,10 +66,10 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //--- Aggregate ticks to detect trend
-   aggregate_ticks(detect_trend, TREND_DETECTION_TIME_FRAME);
+   aggregate_ticks(detect_trend, TREND_DETECTION_TIME_FRAME, "trend");
    
 //--- Aggregate ticks to detect breakout
-   aggregate_ticks(detect_breakout, PERIOD_CURRENT);
+   aggregate_ticks(detect_breakout, PERIOD_CURRENT, "breakout");
   }
 //+------------------------------------------------------------------+
 //| TradeTransaction function                                        |

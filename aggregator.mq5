@@ -10,18 +10,18 @@
 //| Call in on_tick event to aggregate ticks to the period to wich   |
 //| EA is attached to and calls callback passed                      |
 //+------------------------------------------------------------------+
-void aggregate_ticks(on_aggregate_def aggregate_cb, ENUM_TIMEFRAMES tf)
+void aggregate_ticks(on_aggregate_def aggregate_cb, ENUM_TIMEFRAMES tf, string id)
   {
 //--- Create last bar time static variable
-   static CHashMap<ENUM_TIMEFRAMES, datetime> last_bars;
+   static CHashMap<string, datetime> last_bars;
 
-   if(!last_bars.ContainsKey(tf))
+   if(!last_bars.ContainsKey(id))
      {
-      last_bars.Add(tf, iTime(_Symbol, tf, 0));
+      last_bars.Add(id, iTime(_Symbol, tf, 0));
      }
 
    datetime last_bar_time;
-   if(!last_bars.TryGetValue(tf, last_bar_time))
+   if(!last_bars.TryGetValue(id, last_bar_time))
      {
       log_warning("Could not retrieve last bar time. Therefore unable to aggregate bars");
       return;
@@ -34,7 +34,7 @@ void aggregate_ticks(on_aggregate_def aggregate_cb, ENUM_TIMEFRAMES tf)
    if(last_bar_time != curr_bar_tim)
      {
       //--- Set last bar time as current bar time
-      last_bars.TrySetValue(tf, curr_bar_tim);
+      last_bars.TrySetValue(id, curr_bar_tim);
 
       log_debug("New bar aggregated - " + (string)tf);
       //--- Callback
