@@ -4,9 +4,15 @@
 //|                                                                  |
 //+------------------------------------------------------------------+
 #include "trend.mqh"
-#include "math.mqh"
 #include "logger.mqh"
 #include "configuration.mqh"
+//+------------------------------------------------------------------+
+//| Check if is uptrend                                              |
+//+------------------------------------------------------------------+
+bool is_uptrend(const vector & lr, const double r_squared)
+  {
+   return false;
+  }
 //+------------------------------------------------------------------+
 //| Check if is downtrend                                            |
 //+------------------------------------------------------------------+
@@ -15,9 +21,9 @@ bool is_downtrend(const vector & lr, const double r_squared)
    return false;
   }
 //+------------------------------------------------------------------+
-//| Check if is uptrend                                              |
+//| Check if is consolidating                                        |
 //+------------------------------------------------------------------+
-bool is_uptrend(const vector & lr, const double r_squared)
+bool is_consolidating(const vector & lr, const double r_squared)
   {
    return false;
   }

@@ -6,8 +6,12 @@
 #ifndef DALEK_STRATEGY_MQH
 #define DALEK_STRAGEGY_MQH
 //+------------------------------------------------------------------+
-//| Entry point of a strategy called on new aggregated bar           |
+//| Detect breakout                                                  |
 //+------------------------------------------------------------------+
-void on_bar_aggregated();
+void detect_breakout(ENUM_TIMEFRAMES tf);
+//+------------------------------------------------------------------+
+//| Detect trend                                                     |
+//+------------------------------------------------------------------+
+void detect_trend(ENUM_TIMEFRAMES tf);
 //+------------------------------------------------------------------+
 #endif

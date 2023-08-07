@@ -7,48 +7,57 @@
 #include "configuration.mqh"
 #include "trend.mqh"
 #include "logger.mqh"
+#include "defs.mqh"
+#include "trader.mqh"
+//+------------------------------------------------------------------+
+//| Current trend detected                                           |
+//+------------------------------------------------------------------+
+TrendDirection current_trend = UNKNOWN;
+//+------------------------------------------------------------------+
+//| Detect breakout                                                  |
+//+------------------------------------------------------------------+
+void detect_breakout(ENUM_TIMEFRAMES tf)
+  {
+  }
 //+------------------------------------------------------------------+
 //| Entry point of a strategy called on new aggregated bar           |
 //+------------------------------------------------------------------+
-void on_bar_aggregated()
+void detect_trend(ENUM_TIMEFRAMES tf)
   {
 //---- Create dependent vector
    static vector v_dependent;
    if(v_dependent.Size() == 0)
      {
       v_dependent.Resize(TREND_DETECTION_BAR_COUNT);
-      for(int i = 0; i < TREND_DETECTION_BAR_COUNT; i++)
+      for(ulong i = 0; i < TREND_DETECTION_BAR_COUNT; i++)
         {
-         v_dependent[i] = i;
+         v_dependent[i] = (double)i;
         }
      }
 
-//---- Define polynomial degree to detect trend
-   static int degree = 2;
-
 //---- Get rates
    matrix m_ohlct;
-   m_ohlct.CopyRates(_Symbol, _Period, COPY_RATES_CLOSE | COPY_RATES_VERTICAL, 1, TREND_DETECTION_BAR_COUNT);
+   m_ohlct.CopyRates(_Symbol, tf, COPY_RATES_CLOSE | COPY_RATES_VERTICAL, 1, TREND_DETECTION_BAR_COUNT);
 
    vector v_close = m_ohlct.Row(0);
 
 
 //---- Calculate polynomial regression
-   vector v_coef = polyfit(v_dependent, v_close, degree);
-   log_debug("Polynomial regression of degree " + (string)degree + " solved");
-   for(int i = 0; i <= degree; i++)
+   vector v_coef = polyfit(v_dependent, v_close, POLYNOMIAL_REGRESSION_DEGREE);
+   log_debug("Polynomial regression of degree " + (string)POLYNOMIAL_REGRESSION_DEGREE + " solved");
+   for(ulong i = 0; i <= POLYNOMIAL_REGRESSION_DEGREE; i++)
      {
       log_debug("Coefficient a" + (string)i + " = " + (string)v_coef[i]);
      }
 
-//---- Fit into y = a0 + a1x + a2x2 ... anxn
+//---- Fit into polynomial - y = a0 + a1x + a2x2 ... anxn
    vector v_fit;
    v_fit.Resize(TREND_DETECTION_BAR_COUNT);
 
-   for(int i = 0; i < TREND_DETECTION_BAR_COUNT; i++)
+   for(ulong i = 0; i < TREND_DETECTION_BAR_COUNT; i++)
      {
       double sum = 0;
-      for(int j = 0; j <= degree; j++)
+      for(ulong j = 0; j <= POLYNOMIAL_REGRESSION_DEGREE; j++)
         {
          sum += v_coef[j] * pow(v_dependent[i], j);
         }
@@ -68,6 +77,7 @@ void on_bar_aggregated()
          log_info("Uptrend started");
          was_uptrend = true;
         }
+      current_trend = RISING;
       return;
      }
    else
@@ -77,6 +87,7 @@ void on_bar_aggregated()
          log_info("Uptrend ended");
          was_uptrend = false;
         }
+      current_trend = UNKNOWN;
      }
 
 //---- Determine downtrend
@@ -88,6 +99,7 @@ void on_bar_aggregated()
          log_info("Downtrend started");
          was_downtrend = true;
         }
+      current_trend = FALLING;
       return;
      }
    else
@@ -97,6 +109,29 @@ void on_bar_aggregated()
          log_info("Downtrend ended");
          was_downtrend = false;
         }
+      current_trend = UNKNOWN;
+     }
+
+//---- Determine side trend
+   static bool was_sidetrend = false;
+   if(is_consolidating(v_fit, rsq))
+     {
+      if(!was_sidetrend)
+        {
+         log_info("Consolidation started");
+         was_sidetrend = true;
+        }
+      current_trend = CONSOLIDATING;
+      return;
+     }
+   else
+     {
+      if(was_sidetrend)
+        {
+         log_info("Consolidation ended");
+         was_sidetrend = false;
+        }
+      current_trend = UNKNOWN;
      }
   }
 //+------------------------------------------------------------------+

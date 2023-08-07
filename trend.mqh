@@ -14,4 +14,8 @@ bool is_downtrend(const vector & lr, const double r_squared);
 //+------------------------------------------------------------------+
 bool is_uptrend(const vector & lr, const double r_squared);
 //+------------------------------------------------------------------+
+//| Check if is uptrend                                              |
+//+------------------------------------------------------------------+
+bool is_consolidating(const vector & lr, const double r_squared);
+//+------------------------------------------------------------------+
 #endif
