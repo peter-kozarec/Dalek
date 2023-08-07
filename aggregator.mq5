@@ -15,11 +15,13 @@ void aggregate_ticks(on_aggregate_def aggregate_cb, ENUM_TIMEFRAMES tf, string i
 //--- Create last bar time static variable
    static CHashMap<string, datetime> last_bars;
 
+//---- Set initial datetime values
    if(!last_bars.ContainsKey(id))
      {
       last_bars.Add(id, iTime(_Symbol, tf, 0));
      }
 
+//---- Retrieve last bars datetime.
    datetime last_bar_time;
    if(!last_bars.TryGetValue(id, last_bar_time))
      {

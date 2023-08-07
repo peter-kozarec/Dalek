@@ -68,6 +68,12 @@ void detect_trend(ENUM_TIMEFRAMES tf)
    const double rsq = r_squared(v_close, v_fit);
    log_debug("R-Squared calculated = " + (string)rsq);
 
+   if(rsq < R_SQUARED_TRESHOLD)
+     {
+      log_info("R-Squared is bellow treshold. Trend could not be detected");
+      return;
+     }
+
 //---- Determine uptrend
    static bool was_uptrend = false;
    if(is_uptrend(v_fit, rsq))

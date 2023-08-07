@@ -18,8 +18,8 @@ input LogLevel LoggingLevel /* Logging level */ = INFO;
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-input group "1 - Position sizing"
-input double MaxRiskPercentage /* Max Risk - Percentage of equity to put at risk for each trade. */ = 2.0;
+input group "1 - Risk management"
+input double MaxRiskPercentage /* Pos. size - Percentage of equity to put at risk for each trade. */ = 2.0;
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -48,6 +48,7 @@ int OnInit()
    TREND_DETECTION_TIME_FRAME = TrendDetectionTimeFrame;
    TREND_DETECTION_BAR_COUNT = TrendDetectionBarCount;
    POLYNOMIAL_REGRESSION_DEGREE = PolynomialDegree;
+   R_SQUARED_TRESHOLD = RSquaredTreshold;
    log_info("Parameters set");
 
    log_info("Dalek started");
@@ -66,10 +67,10 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //--- Aggregate ticks to detect trend
-   aggregate_ticks(detect_trend, TREND_DETECTION_TIME_FRAME, "trend");
+   aggregate_ticks(detect_trend, TREND_DETECTION_TIME_FRAME, "detect_trend");
    
 //--- Aggregate ticks to detect breakout
-   aggregate_ticks(detect_breakout, PERIOD_CURRENT, "breakout");
+   aggregate_ticks(detect_breakout, PERIOD_CURRENT, "detect_breakout");
   }
 //+------------------------------------------------------------------+
 //| TradeTransaction function                                        |
