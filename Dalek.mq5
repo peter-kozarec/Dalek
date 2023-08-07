@@ -8,6 +8,7 @@
 #include "configuration.mqh"
 #include "logger.mqh"
 #include "trader.mqh"
+#include "context.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -19,7 +20,7 @@ input LogLevel LoggingLevel /* Logging level */ = INFO;
 //|                                                                  |
 //+------------------------------------------------------------------+
 input group "1 - Risk management"
-input double MaxRiskPercentage /* Pos. size - Percentage of equity to put at risk for each trade. */ = 2.0;
+input double MaxRiskPercentage /* Percentage of equity to put at risk for each trade. */ = 2.0;
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -37,19 +38,35 @@ input double RSquaredTreshold /* R-Squared treshold - Treshold for model to be c
 // ToDo
 
 //+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+input group "4 - Test settings (Flushed on deinit. Only for test!)"
+input bool WriteTestDataToFiles /* Write test data to files. */ = true;
+input string TestDataDirectory /* Test data directory. Needs write permission. */ = "";
+input string TestDataPrefix /* Test data file prefix. */ = "test_";
+
+//+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
 int OnInit()
   {
 //--- Initialize configuration parameters
-   MAGIC_NUMBER = MagicNumber;
-   LOGGER_LEVEL = LoggingLevel;
-   MAX_RISK_PER_TRADE = MaxRiskPercentage;
-   TREND_DETECTION_TIME_FRAME = TrendDetectionTimeFrame;
-   TREND_DETECTION_BAR_COUNT = TrendDetectionBarCount;
-   POLYNOMIAL_REGRESSION_DEGREE = PolynomialDegree;
-   R_SQUARED_TRESHOLD = RSquaredTreshold;
+   MAGIC_NUMBER                  = MagicNumber;
+   LOGGER_LEVEL                  = LoggingLevel;
+   MAX_RISK_PER_TRADE            = MaxRiskPercentage;
+   TREND_DETECTION_TIME_FRAME    = TrendDetectionTimeFrame;
+   TREND_DETECTION_BAR_COUNT     = TrendDetectionBarCount;
+   POLYNOMIAL_REGRESSION_DEGREE  = PolynomialDegree;
+   R_SQUARED_TRESHOLD            = RSquaredTreshold;
+   WRITE_TEST_DATA               = WriteTestDataToFiles;
+   TEST_DATA_DIR                 = TestDataDirectory;
+   TEST_DATA_PREFIX              = TestDataPrefix;
    log_info("Parameters set");
+
+   if(WRITE_TEST_DATA)
+     {
+      log_warning("Caussion, writting test data to files enabled.");
+     }
 
    log_info("Dalek started");
    return INIT_SUCCEEDED;
@@ -59,6 +76,13 @@ int OnInit()
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason)
   {
+   if(WRITE_TEST_DATA)
+     {
+      trend_analysis_data.flush(TEST_DATA_DIR + "/" +
+                                TEST_DATA_PREFIX +
+                                "TREND_ANALYSIS.csv");
+     }
+
    log_info("Dalek closed. Reason = " + (string)reason);
   }
 //+------------------------------------------------------------------+
@@ -68,18 +92,8 @@ void OnTick()
   {
 //--- Aggregate ticks to detect trend
    aggregate_ticks(detect_trend, TREND_DETECTION_TIME_FRAME, "detect_trend");
-   
+
 //--- Aggregate ticks to detect breakout
    aggregate_ticks(detect_breakout, PERIOD_CURRENT, "detect_breakout");
   }
-//+------------------------------------------------------------------+
-//| TradeTransaction function                                        |
-//+------------------------------------------------------------------+
-void OnTradeTransaction(const MqlTradeTransaction &trans,
-                        const MqlTradeRequest &request,
-                        const MqlTradeResult &result)
-  {
-
-  }
-//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
