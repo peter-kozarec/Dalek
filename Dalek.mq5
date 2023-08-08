@@ -1,7 +1,10 @@
 //+------------------------------------------------------------------+
 //|                                                        dalek.mq5 |
 //|                                    Copyright 2023, Peter Kozarec |
-//|                                                                  |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2023, Peter Kozarec"
+#property link      "https://www.mql5.com/en/users/peterkozarec"
+#property version   "1.00"
 //+------------------------------------------------------------------+
 #include "aggregator.mqh"
 #include "strategy.mqh"
@@ -14,7 +17,7 @@
 //+------------------------------------------------------------------+
 input group "0 - General settings"
 input ulong MagicNumber /* Magic number - Unique ID for EA */ = 123456789;
-input LogLevel LoggingLevel /* Logging level */ = INFO;
+input defs::LogLevel LoggingLevel /* Logging level */ = defs::INFO;
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -41,7 +44,7 @@ input double RSquaredTreshold /* R-Squared treshold - Treshold for model to be c
 //|                                                                  |
 //+------------------------------------------------------------------+
 input group "4 - Test settings (Flushed on deinit. Only for test!)"
-input bool WriteTestDataToFiles /* Write test data to files. */ = true;
+input bool WriteTestDataToFiles /* Write test data to files. */ = false;
 input string TestDataDirectory /* Test data directory. Needs write permission. */ = "";
 input string TestDataPrefix /* Test data file prefix. */ = "test_";
 
@@ -51,49 +54,58 @@ input string TestDataPrefix /* Test data file prefix. */ = "test_";
 int OnInit()
   {
 //--- Initialize configuration parameters
-   MAGIC_NUMBER                  = MagicNumber;
-   LOGGER_LEVEL                  = LoggingLevel;
-   MAX_RISK_PER_TRADE            = MaxRiskPercentage;
-   TREND_DETECTION_TIME_FRAME    = TrendDetectionTimeFrame;
-   TREND_DETECTION_BAR_COUNT     = TrendDetectionBarCount;
-   POLYNOMIAL_REGRESSION_DEGREE  = PolynomialDegree;
-   R_SQUARED_TRESHOLD            = RSquaredTreshold;
-   WRITE_TEST_DATA               = WriteTestDataToFiles;
-   TEST_DATA_DIR                 = TestDataDirectory;
-   TEST_DATA_PREFIX              = TestDataPrefix;
-   log_info("Parameters set");
-
-   if(WRITE_TEST_DATA)
+   configuration::magic_number = MagicNumber;
+   configuration::logger_level = LoggingLevel;
+   configuration::max_risk_per_trade = MaxRiskPercentage;
+   configuration::trend_detection_time_frame = TrendDetectionTimeFrame;
+   configuration::trend_detection_bar_count = TrendDetectionBarCount;
+   configuration::trend_detection_polynomial_degree = PolynomialDegree;
+   configuration::trend_detection_r_squared_treshold = RSquaredTreshold;
+   
+   if(MQLInfoInteger(MQL_TESTER))
      {
-      log_warning("Caussion, writting test data to files enabled.");
-     }
+      configuration::write_test_data = WriteTestDataToFiles;
+      configuration::test_data_dir = TestDataDirectory;
+      configuration::test_data_prefix = TestDataPrefix;
+     } // if(MQLInfoInteger(MQL_TESTER))
+   else
+     {
+      configuration::write_test_data = false;
+     } // if(!MQLInfoInteger(MQL_TESTER))
 
-   log_info("Dalek started");
+   logger::log_info("Parameters set");
+   logger::log_info("Dalek started");
+ 
    return INIT_SUCCEEDED;
-  }
+  } // OnInit
 //+------------------------------------------------------------------+
 //| Expert deinitialization function                                 |
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason)
   {
-   if(WRITE_TEST_DATA)
+   if(configuration::write_test_data)
      {
-      trend_analysis_data.flush(TEST_DATA_DIR + "/" +
-                                TEST_DATA_PREFIX +
-                                "TREND_ANALYSIS.csv");
-     }
+      context::trend_analysis_writter.flush(
+         configuration::test_data_dir + "/" +
+         configuration::test_data_prefix +
+         "TREND_ANALYSIS.csv");
+     } // if(configuration::write_test_data)
 
-   log_info("Dalek closed. Reason = " + (string)reason);
-  }
+   logger::log_info("Dalek closed. Reason = " + (string)reason);
+  } // OnDeinit
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick()
   {
 //--- Aggregate ticks to detect trend
-   aggregate_ticks(detect_trend, TREND_DETECTION_TIME_FRAME, "detect_trend");
+   aggregator::aggregate_ticks(strategy::detect_trend, 
+                               configuration::trend_detection_time_frame, 
+                               "detect_trend");
 
 //--- Aggregate ticks to detect breakout
-   aggregate_ticks(detect_breakout, PERIOD_CURRENT, "detect_breakout");
-  }
+   aggregator::aggregate_ticks(strategy::detect_breakout, 
+                               PERIOD_CURRENT, 
+                               "detect_breakout");
+  } // OnTick
 //+------------------------------------------------------------------+
