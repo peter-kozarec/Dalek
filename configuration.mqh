@@ -1,7 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                configuration.mqh |
 //|                                    Copyright 2023, Peter Kozarec |
-//|                                                                  |
 //+------------------------------------------------------------------+
 #ifndef DALEK_CONFIGURATION_MQH
 #define DALEK_CONFIGURATION_MQH
