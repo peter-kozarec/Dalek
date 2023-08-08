@@ -52,4 +52,4 @@ string test_data_dir;
 string test_data_prefix;
 };
 //+------------------------------------------------------------------+
-#endif
+#endif // DALEK_CONFIGURATION_MQH

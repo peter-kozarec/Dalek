@@ -32,4 +32,4 @@ bool is_consolidating(const vector & estimates, const double r_sqrd)
 //+------------------------------------------------------------------+
 }; // namespace trend
 //+------------------------------------------------------------------+
-#endif
+#endif // DALEK_TREND_MQH

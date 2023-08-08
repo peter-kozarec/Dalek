@@ -56,4 +56,4 @@ vector polyfit(const vector & x, const vector & y, const ulong degree)
 //+------------------------------------------------------------------+
 }; // namespace regression
 //+------------------------------------------------------------------+
-#endif
+#endif // DALEK_REGRESSION_MQH
